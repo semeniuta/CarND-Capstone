@@ -4,7 +4,9 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 
+import numpy as np
 import math
+from scipy.spatial import KDTree
 
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
@@ -22,6 +24,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
+UPDATER_RATE = 50
 
 
 class WaypointUpdater(object):
@@ -33,20 +36,49 @@ class WaypointUpdater(object):
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
-
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
+        self.pose = None
+        self.base_wp = None
+        self.wp_tree = None
+        self.pose_counter = 0
 
-        rospy.spin()
+        rospy.loginfo("Starting WaypointUpdater")
+        #rospy.spin()
+        self.loop()
 
+    def loop(self):
+
+        rate = rospy.Rate(UPDATER_RATE)
+        while not rospy.is_shutdown():
+            
+            if self.wp_tree and self.pose:
+
+                p = self.pose.pose.position
+                xy = np.array([p.x, p.y])
+
+                if self.pose_counter % 100 == 0:
+                    rospy.loginfo('#{}: {}'.format(self.pose_counter, xy))
+
+            rate.sleep()
+                
     def pose_cb(self, msg):
         # TODO: Implement
-        pass
+
+        self.pose = msg
+        self.pose_counter += 1
 
     def waypoints_cb(self, waypoints):
         # TODO: Implement
-        pass
+        
+        self.base_wp = waypoints
+
+        positions = (wp.pose.pose.position for wp in self.base_wp.waypoints)
+        waypoints_xy = [np.array([p.x, p.y]) for p in positions]
+        self.wp_tree = KDTree(waypoints_xy)
+
+        rospy.loginfo("Got {} base waypoints".format(len(waypoints_xy)))
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
