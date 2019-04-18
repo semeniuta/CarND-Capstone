@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node pkg="waypoint_updater" type="waypoint_updater.py" name="waypoint_updater" output="screen" />
+
+    <node pkg="waypoint_loader" type="waypoint_loader.py" name="waypoint_loader" output="screen">
+        <param name="path" value="$(find styx)../../../data/wp_yaw_const.csv" />
+        <param name="velocity" value="40" />
+    </node>
+
+    <!-- waypoint follower pure_pursuit.launch -->
+    <arg name="linear_interpolate_mode" default="True"/>
+	<node pkg="waypoint_follower" type="pure_pursuit" name="pure_pursuit" output="log">
+		<param name="linear_interpolate_mode" value="$(arg linear_interpolate_mode)"/>
+	</node>
+
+    <!-- twist_controller dbw_sim.launch -->
+    <node pkg="twist_controller" type="dbw_node.py" name="dbw_node">
+        <param name="vehicle_mass" value="1080." />
+        <param name="fuel_capacity" value="0." />
+        <param name="brake_deadband" value=".2" />
+        <param name="decel_limit" value="-5." />
+        <param name="accel_limit" value="1." />
+        <param name="wheel_radius" value="0.335" />
+        <param name="wheel_base" value="3" />
+        <param name="steer_ratio" value="14.8" />
+        <param name="max_lat_accel" value="3." />
+        <param name="max_steer_angle" value="8." />
+    </node>
+
+</launch>
