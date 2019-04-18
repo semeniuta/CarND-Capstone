@@ -25,6 +25,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
 UPDATER_RATE = 50
+POSE_LOG_PERIOD = 100
 
 
 class WaypointUpdater(object):
@@ -36,11 +37,11 @@ class WaypointUpdater(object):
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
-        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
+        self.final_waypoints_pub = rospy.Publisher('/final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
         self.pose = None
-        self.base_wp = None
+        self.waypoints = None
         self.wp_tree = None
         self.pose_counter = 0
 
@@ -54,15 +55,49 @@ class WaypointUpdater(object):
         while not rospy.is_shutdown():
             
             if self.wp_tree and self.pose:
+                self.loginfo_pose_xy()
 
-                p = self.pose.pose.position
-                xy = np.array([p.x, p.y])
-
-                if self.pose_counter % 100 == 0:
-                    rospy.loginfo('#{}: {}'.format(self.pose_counter, xy))
+                closest_idx = self.find_closest()
+                self.publish_final_waypoints(closest_idx)
 
             rate.sleep()
-                
+
+    def loginfo_pose_xy(self):
+
+        if self.pose_counter % POSE_LOG_PERIOD == 0:
+
+            p = self.pose.pose.position
+            t = self.pose.header.stamp
+
+            rospy.loginfo('t={}: ({:.3f}, {:.3f})'.format(t, p.x, p.y))
+
+            self.pose_counter = 0
+
+    def find_closest(self):
+        
+        p = self.pose.pose.position
+        xy = np.array([p.x, p.y])
+
+        closest_idx = self.wp_tree.query(xy, 1)[1]
+
+        target = self.waypoints_xy[closest_idx]
+        prev = self.waypoints_xy[closest_idx - 1]
+
+        val = np.dot(target - prev, xy - target)
+
+        if val > 0:
+            closest_idx = (closest_idx + 1) % len(self.waypoints_xy)
+
+        return closest_idx
+
+    def publish_final_waypoints(self, closest_idx):
+        
+        lane = Lane()
+        lane.header = self.waypoints.header
+        lane.waypoints = self.waypoints.waypoints[closest_idx:closest_idx+LOOKAHEAD_WPS]
+
+        self.final_waypoints_pub.publish(lane)
+
     def pose_cb(self, msg):
         # TODO: Implement
 
@@ -72,13 +107,13 @@ class WaypointUpdater(object):
     def waypoints_cb(self, waypoints):
         # TODO: Implement
         
-        self.base_wp = waypoints
+        self.waypoints = waypoints
 
-        positions = (wp.pose.pose.position for wp in self.base_wp.waypoints)
-        waypoints_xy = [np.array([p.x, p.y]) for p in positions]
-        self.wp_tree = KDTree(waypoints_xy)
+        positions = (wp.pose.pose.position for wp in self.waypoints.waypoints)
+        self.waypoints_xy = np.array([[p.x, p.y] for p in positions])
+        self.wp_tree = KDTree(self.waypoints_xy)
 
-        rospy.loginfo("Got {} base waypoints".format(len(waypoints_xy)))
+        rospy.loginfo("Got {} base waypoints".format(len(self.waypoints_xy)))
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
