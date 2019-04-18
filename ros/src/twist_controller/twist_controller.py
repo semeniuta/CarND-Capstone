@@ -71,7 +71,7 @@ class Controller(object):
 
         steering = self.yaw_contoller.get_steering(linear_vel, angular_vel, current_vel)
 
-        vel_error = current_vel - linear_vel
+        vel_error = linear_vel - current_vel
         self.last_vel = current_vel
 
         current_time = rospy.get_time()
@@ -83,11 +83,13 @@ class Controller(object):
         brake = 0 # brake is in units of torque -- N*m
 
         if linear_vel == 0. and current_vel < 0.1:
+            # the vehicle is about to stop
             
             throttle = 0.
             brake = 400.
 
         elif throttle < 0.1 and vel_error < 0:
+            # the vehicle is going faster than it should 
 
             throttle = 0.
             decel = max(vel_error, self.decel_limit)
