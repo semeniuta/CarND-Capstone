@@ -13,6 +13,12 @@ v1.3
 
 Port: 4567
 
+To do port forwarding using `ncat` (ROS host and the computer running the simulator are two physical machines):
+
+```
+ncat --sh-exec "ncat $ROS_HOST 4567" -l 4567 --keep-open
+```
+
 ### Dependencies
 
 sudo apt install python-eventlet python-flask
