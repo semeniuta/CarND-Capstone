@@ -184,7 +184,7 @@ class TLDetector(object):
         rospy.loginfo('Number of lights: {}'.format(len(self.lights)))
         
         if idx_closest_to_light:
-            state = self.get_light_state(light)
+            state = self.get_light_state(closest_light)
             rospy.loginfo('Light state: {}'.format(state))
             return idx_closest_to_light, state
         
