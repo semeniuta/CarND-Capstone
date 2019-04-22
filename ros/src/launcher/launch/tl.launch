@@ -2,7 +2,7 @@
 <launch>
     
     <!-- waypoint_updater waypoint_updater.launch -->
-    <node pkg="waypoint_updater" type="waypoint_updater.py" name="waypoint_updater" />
+    <node pkg="waypoint_updater" type="waypoint_updater.py" name="waypoint_updater" output="screen" />
 
     <!-- waypoint_loader waypoint_loader.launch -->
     <node pkg="waypoint_loader" type="waypoint_loader.py" name="waypoint_loader">
