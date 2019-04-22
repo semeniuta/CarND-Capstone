@@ -172,20 +172,17 @@ class TLDetector(object):
                 idx_closest_to_light_cand = self.get_closest_waypoint(line[0], line[1])
 
                 d = idx_closest_to_light_cand - idx_closest_to_car
-                rospy.loginfo('d={}'.format(d))
 
                 if d >= 0 and d < diff:
                     diff = d
                     idx_closest_to_light = idx_closest_to_light_cand
                     closest_light = light
-
-        rospy.loginfo('Best candidate: {}'.format(idx_closest_to_light))
-        rospy.loginfo('diff={}'.format(diff))
-        rospy.loginfo('Number of lights: {}'.format(len(self.lights)))
         
         if idx_closest_to_light:
             state = self.get_light_state(closest_light)
-            rospy.loginfo('Light state: {}'.format(state))
+
+            rospy.loginfo('diff={0}; light_state={1}'.format(diff, state))
+            
             return idx_closest_to_light, state
         
         return -1, TrafficLight.UNKNOWN
