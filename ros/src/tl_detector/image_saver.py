@@ -36,6 +36,11 @@ class ImageSaver:
         self.image = None
         self.lights = None
 
+        self.images_to_save = []
+        self.prev_idx_diff = None
+        self.image_counter = 0
+        self.every_nth = 5
+
         rospy.loginfo('CWD: {}'.format(os.getcwd()))
 
         rospy.spin()
@@ -48,16 +53,42 @@ class ImageSaver:
 
         light_wp, state, idx_diff = self.process_traffic_lights()
 
-        if idx_diff < 30 and idx_diff > 5:
-            im = self.bridge.imgmsg_to_cv2(self.image, "bgr8")
-            ts = rospy.get_rostime()
-            fname = '{0}{1}_{2}.jpg'.format(ts.secs, ts.nsecs, state)
-            cv2.imwrite(fname, im)
-            rospy.loginfo('Saved image to {}'.format(fname))
+        if self.prev_idx_diff is not None:
+            change = idx_diff - self.prev_idx_diff
+            if change > 50:
+                self.save_images()
+                self.image_counter = 0
+                self.images_to_save = []
+            
+        if idx_diff < 100 and idx_diff >= 0:
+            
+            if self.image_counter == 0:
+        
+                im = self.bridge.imgmsg_to_cv2(self.image, "bgr8")
+                ts = rospy.get_rostime()
+                self.images_to_save.append((im, ts, state))
 
-            rospy.sleep(0.25)
+        self.image_counter += 1
+        if self.image_counter == self.every_nth:
+            self.image_counter = 0 # save the next one
 
-            # https://answers.ros.org/question/283724/saving-images-with-image_saver-with-timestamp/
+        self.prev_idx_diff = idx_diff
+            
+    def save_images(self):
+
+        # https://answers.ros.org/question/283724/saving-images-with-image_saver-with-timestamp/
+
+        n = len(self.images_to_save)
+        rospy.loginfo('Saving {} images'.format(n))
+
+        im_dir = '/home/alex/carnd_tl/2'
+
+        for im, ts, state in self.images_to_save:
+
+            fname = '{0}{1}_{2}.jpg'.format(ts.secs, ts.nsecs // 1000000, state)
+            fname_full = os.path.join(im_dir, fname)
+            cv2.imwrite(fname_full, im)
+            rospy.loginfo('Saved image to {}'.format(fname_full))
 
     def pose_cb(self, msg):
         self.pose = msg
@@ -110,7 +141,7 @@ class ImageSaver:
             
             state = self.get_light_state(closest_light)
             
-            rospy.loginfo('Light state: {}'.format(state))
+            #rospy.loginfo('Light state: {}'.format(state))
             rospy.loginfo('diff={}'.format(diff))
             
             return idx_closest_to_light, state, diff
