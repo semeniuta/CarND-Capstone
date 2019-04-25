@@ -21,11 +21,19 @@ ncat --sh-exec "ncat $ROS_HOST 4567" -l 4567 --keep-open
 
 ### Dependencies
 
-sudo apt install python-eventlet python-flask
-pip install attrdict python-socketio
+```
+sudo apt install python-eventlet python-werkzeug python-jinja2 python-itsdangerous
+```
 
-
+```bash
 mkvirtualenv -p python --system-site-packages carndros
+
+# In the `carndros` virtual environment:
+
+pip install -r requirements.txt
+```
+
+Note: `eventlet` version 0.19.0 from PyPI doesn't have the `monkey_patch` function, while the one from the Ubuntu repo does. 
 
 ---
 
