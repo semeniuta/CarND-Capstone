@@ -36,4 +36,7 @@
     <!--Traffic Light Locations and Camera Config -->
     <param name="traffic_light_config" textfile="$(find tl_detector)/sim_traffic_light_config.yaml" />
 
+    <!-- Server update rate (for waypoint_detector and dbw_node) -->
+    <param name="server_rate" value="15" type="double" />
+
 </launch>

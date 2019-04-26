@@ -46,6 +46,9 @@ class DBWNode(object):
         max_lat_accel = rospy.get_param('~max_lat_accel', 3.)
         max_steer_angle = rospy.get_param('~max_steer_angle', 8.)
 
+        self.server_rate = rospy.get_param('/server_rate', 50.) # 50 Hz by default
+        rospy.loginfo('server_rate={0}'.format(self.server_rate))
+
         self.steer_pub = rospy.Publisher('/vehicle/steering_cmd',
                                          SteeringCmd, queue_size=1)
         self.throttle_pub = rospy.Publisher('/vehicle/throttle_cmd',
@@ -99,7 +102,7 @@ class DBWNode(object):
 
     def loop(self):
 
-        rate = rospy.Rate(15) # 50Hz
+        rate = rospy.Rate(self.server_rate) 
         
         while not rospy.is_shutdown():
             # TODO: Get predicted throttle, brake, and steering using `twist_controller`
