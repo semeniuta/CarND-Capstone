@@ -41,6 +41,15 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
+### Udacity workspace
+
+A solution to the issue with `catkin_pkg` in Udacity workspace (ROS Kinetic), suggested by Hareendra Manuru on CarND Slack:
+
+```bash
+# changed version: 0.4.2 -> 0.4.12
+pip install --upgrade catkin_pkg 
+```
+
 ### Native Installation
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).
