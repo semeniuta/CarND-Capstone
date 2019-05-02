@@ -141,8 +141,7 @@ class ImageSaver:
             
             state = self.get_light_state(closest_light)
             
-            #rospy.loginfo('Light state: {}'.format(state))
-            rospy.loginfo('diff={}'.format(diff))
+            rospy.loginfo('diff={0}; light_state={1}'.format(diff, state))
             
             return idx_closest_to_light, state, diff
         
