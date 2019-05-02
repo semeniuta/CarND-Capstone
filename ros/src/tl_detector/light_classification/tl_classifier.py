@@ -1,5 +1,7 @@
 from styx_msgs.msg import TrafficLight
 
+from tlcv import detect_red_light
+
 class TLClassifier(object):
     def __init__(self):
         #TODO load classifier
@@ -16,4 +18,8 @@ class TLClassifier(object):
 
         """
         #TODO implement light color prediction
+
+        if detect_red_light(image):
+            return TrafficLight.RED
+
         return TrafficLight.UNKNOWN

@@ -129,19 +129,17 @@ class TLDetector(object):
 
         """
 
-        return light.state # TODO change to real classification later
-
-        """ # (save for later)
-        if(not self.has_image):
+        if not self.has_image:
             self.prev_light_loc = None
             return False
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-
-        #Get classification
-        return self.light_classifier.get_classification(cv_image)
-        """
-
+        cv_light_class = self.light_classifier.get_classification(cv_image)
+        
+        #rospy.loginfo("sim_state: {0}; CV state: {1}".format(light.state, cv_light_class))
+        
+        return cv_light_class # return light.state
+        
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
             location and color
