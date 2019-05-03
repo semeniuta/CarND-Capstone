@@ -1,29 +1,57 @@
 # CarND Capstone Project
 
-## Notes 
+[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-### Intro
+The capstone (system integration) project in the Udacity's Self-Driving Car NanoDegree. The original project template can be found [here](https://github.com/udacity/CarND-Capstone). For more information about the project, see [the project introduction](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
-Original repo: https://github.com/udacity/CarND-Capstone
+## Implementation notes 
+
+### ROS versions
+
+The project was implemented based on ROS Melodic (Ubuntu 18.04). To launch the nodes on ROS Kinetic, reinitialize the catkin workspace:
+
+```bash
+# in ros/src
+rm CMakeLists.txt
+catkin_init_workspace
+```
+
+### Update rate
+
+One of the major difficulties has been the inability of the simulator to handle incoming messages at the rate of **50 Hz** (the simulator kept freezing when camera streaming was enabled). It was observed, however, that for the track 1 in the simulator **15 Hz** was generally sufficient, and the program didn't freeze after enabling camera streaming. 
+
+The `waypoint_updater` and `twist_controller` nodes were programmed to read the update rate as a ROS parameter if it is provided by the launch file, or otherwise fall back to 50 Hz. This means that by default, when launching the project from `launch/{styx, site}.launch`, the update rate is 50 Hz. To launch the project in the development mode with 15 Hz enabled, use two terminals: 
+
+```bash
+# terminal 1
+roslaunch styx server.launch
+```
+
+```bash
+# terminal 2
+roslaunch launcher tl.launch
+```
 
 ### Simulator
 
-https://github.com/udacity/CarND-Capstone/releases
-v1.3
+[The capstone project simular](https://github.com/udacity/CarND-Capstone/releases) was of version **1.3** when this project was implemented. 
 
-Port: 4567
+For performance reasons, it can be beneficial to run the simulator and the ROS nodes on two physical machines. Since the simulator listens at port **4567** on its localhost, port forwarding can be realized using `ncat`:
 
-To do port forwarding using `ncat` (ROS host and the computer running the simulator are two physical machines):
-
-```
+```bash
+# $ROS_HOST is the IP address of the Linux machine running ROS nodes
 ncat --sh-exec "ncat $ROS_HOST 4567" -l 4567 --keep-open
 ```
 
 ### Dependencies
 
+Part of the Python dependencies are installed from the Ubuntu repository:
+
 ```
 sudo apt install python-eventlet python-werkzeug python-jinja2 python-itsdangerous
 ```
+
+The rest of the dependencies (from `requirements.txt`) can be installed in an isolated virtual environment:
 
 ```bash
 mkvirtualenv -p python --system-site-packages carndros
@@ -35,20 +63,19 @@ pip install -r requirements.txt
 
 Note: `eventlet` version 0.19.0 from PyPI doesn't have the `monkey_patch` function, while the one from the Ubuntu repo does. 
 
----
-
-This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
-
-Please use **one** of the two installation options, either native **or** docker installation.
-
 ### Udacity workspace
 
 A solution to the issue with `catkin_pkg` in Udacity workspace (ROS Kinetic), suggested by Hareendra Manuru on CarND Slack:
 
 ```bash
-# changed version: 0.4.2 -> 0.4.12
+# changes version: 0.4.2 -> 0.4.12
 pip install --upgrade catkin_pkg 
 ```
+---
+
+## Guidelines from Udacity
+
+Please use **one** of the two installation options, either native **or** docker installation.
 
 ### Native Installation
 

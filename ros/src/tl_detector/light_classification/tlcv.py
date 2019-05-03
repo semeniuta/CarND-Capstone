@@ -1,3 +1,7 @@
+"""
+Computer vision rutines for traffic ligth classification
+"""
+
 from __future__ import print_function
 import cv2
 import random
@@ -78,10 +82,6 @@ def favor_pure_red(G, B, t):
     not_so_blue = threshold_binary_inv(B, t)
     
     return not_so_green & not_so_blue
-
-
-def combine_thresholds(binary_R, binary_S, binary_notGB):
-    return binary_R & binary_S & binary_notGB
 
 
 def find_potential_tl(ccomp_stats, max_ratio_overhead, min_side_len):

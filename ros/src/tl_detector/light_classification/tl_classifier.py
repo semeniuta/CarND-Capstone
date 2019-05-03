@@ -3,9 +3,6 @@ from styx_msgs.msg import TrafficLight
 from tlcv import detect_red_light
 
 class TLClassifier(object):
-    def __init__(self):
-        #TODO load classifier
-        pass
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
@@ -17,7 +14,11 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        #TODO implement light color prediction
+        
+        # NOTE: In the current form, TLClassifier uses 
+        # classical computer vision routines from 
+        # tlcv to distinguish between red traffic light 
+        # and everyhing else
 
         if detect_red_light(image):
             return TrafficLight.RED
