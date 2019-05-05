@@ -43,12 +43,16 @@ For performance reasons, it can be beneficial to run the simulator and the ROS n
 ncat --sh-exec "ncat $ROS_HOST 4567" -l 4567 --keep-open
 ```
 
+### Traffic light classification
+
+The classification logic in the `tl_detector` node is implemented with classical computer vision using OpenCV and Pandas. The idea is to detect regions in the image with high value of the red channel, high saturation, and low levels of the green and blue components. Further, the resulting binary image is used to detect connected components and filter them by size and with-to-height ratio (see functions `detect_red_light` and `find_potential_tl` in `tl_detector/ligth_classification/tlcv.py`). This solution is quite simplistic in the sense that it only detects red traffic light signal. In addition, it might not work in certain non-simulated scenarios depending on the weather conditions. 
+
 ### Dependencies
 
 Part of the Python dependencies are installed from the Ubuntu repository:
 
 ```
-sudo apt install python-eventlet python-werkzeug python-jinja2 python-itsdangerous
+sudo apt install python-eventlet python-werkzeug python-jinja2 python-itsdangerous python-pandas
 ```
 
 The rest of the dependencies (from `requirements.txt`) can be installed in an isolated virtual environment:
@@ -61,7 +65,7 @@ mkvirtualenv -p python --system-site-packages carndros
 pip install -r requirements.txt
 ```
 
-Note: `eventlet` version 0.19.0 from PyPI doesn't have the `monkey_patch` function, while the one from the Ubuntu repo does. 
+Note: `eventlet` version 0.19.0 from PyPI doesn't have the `monkey_patch` function, while the one from the Ubuntu repo does. Additionally, `pandas` is installed to support the custom traffic light classification logic. 
 
 ### Udacity workspace
 

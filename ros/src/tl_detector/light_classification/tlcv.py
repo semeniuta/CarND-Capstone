@@ -103,6 +103,15 @@ def find_potential_tl(ccomp_stats, max_ratio_overhead, min_side_len):
 
 
 def detect_red_light(im_bgr, t_R=200, t_S=100, t_GB=150, max_ratio_overhead=0.1, min_side_len=5):
+    """
+    Detect whether a red traffic light is present in the image.
+
+    The idea is to detect regions in the image with high value of 
+    the red channel, high saturation, and low levels of the
+    green and blue components. Further, the resulting binary image 
+    is used to detect connected components and filter them by 
+    size and with-to-height ratio.
+    """
     
     R, G, B, S = get_channels(im_bgr)
     
